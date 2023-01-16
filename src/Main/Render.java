@@ -17,12 +17,12 @@ public class Render {
 		switch(GameStates.gameState) {
 		
 		case MENU -> game.getMenu().render(g);
+		case TUTORIAL -> game.getTutorial().render(g);
 		case PLAYING -> game.getPlay().render(g);
 		case SETTINGS ->game.getSettings().render(g);
 		case EDIT -> game.getEditor().render(g);
 		case GAME_OVER -> game.getGameOver().render(g);
-		
-		default -> throw new IllegalArgumentException("Unexpected value: " + GameStates.gameState);
+		case GAME_WON -> game.getGameWon().render(g);
 		
 		}
 	}

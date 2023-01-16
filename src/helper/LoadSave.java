@@ -14,75 +14,110 @@ import javax.imageio.ImageIO;
 import objects.PathPoint;
 
 public class LoadSave {
-	
-	//return path to user home directory
-	public static String homePath = System.getProperty("user.home"); 
-    //name of the created folder
+
+	// Return path to user home directory
+	public static String homePath = System.getProperty("user.home");
+	// Name of the created folder
 	public static String saveFolder = "TD";
-    //name of the file with starting map
+	// Name of the file with starting map
 	public static String levelFile = "level.txt";
-    //File.separator ensures that path works on any system '/' and '\' problems it does it automatically
+	// File.separator ensures that path works on any system '/' and '\' decides
+	// automatically
 	public static String filePath = homePath + File.separator + saveFolder + File.separator + levelFile;
-    
+
+	// defult level if not changed by the player
+	private static File defaultLevel = new File("resources" + File.separator + "defaultLevel.txt");
+
 	private static File lvlFile = new File(filePath);
- 
+
+	private static boolean newLevelRequested;
+
+	public static void CreateFolder() {
+		File folder = new File(homePath + File.separator + saveFolder);
+		folder.mkdir();
+	}
 	
-    public static void CreateFolder() {
-    	File folder = new File(homePath + File.separator + saveFolder);
-    	folder.mkdir();
-    }
-    
-	//Load sprite
+	
+
+	// Load sprites
 	public static BufferedImage getSpriteAtlas() {
-		
+
 		BufferedImage img = null;
 
 		InputStream is = LoadSave.class.getClassLoader().getResourceAsStream("SpritesNew.png");
 		try {
 			img = ImageIO.read(is);
-		} 
-		catch (IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
-		}	
+		}
 		return img;
 	}
 	
-	public static BufferedImage getHeartsAtlas() {
+	// Load tutorial
+	public static BufferedImage getTutorial(Integer number) {
 		
 		BufferedImage img = null;
 		
+		InputStream is = LoadSave.class.getClassLoader().getResourceAsStream("Tutorial" + Integer.toString(number) + ".png");
+
+		try {
+			img = ImageIO.read(is);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return img;
+	}
+	
+	// Load trees 
+	public static BufferedImage getTrees() {
+
+		BufferedImage img = null;
+
+		InputStream is = LoadSave.class.getClassLoader().getResourceAsStream("Trees.png");
+		try {
+			img = ImageIO.read(is);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return img;
+	}
+	
+	// Load hearts
+	public static BufferedImage getHeartsAtlas() {
+
+		BufferedImage img = null;
+
 		InputStream is = LoadSave.class.getClassLoader().getResourceAsStream("Hearts.png");
 		try {
 			img = ImageIO.read(is);
-		}catch(IOException e) {
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return img;	
+		return img;
 	}
-	
 
-	
-
-	//Generate map
+	// Generate map
 	public static void CreateLevel(int[] idArr) {
-		
-		if(lvlFile.exists())
-		{
-			System.out.println("File " + lvlFile + " already Exist, can't create");
+
+		// If default level is there do nothing
+		if (defaultLevel.exists()) {
+			System.out.println("File " + defaultLevel + " already Exist, can't create");
 			return;
-		}
-		else {
+		} else {
 			try {
-				lvlFile.createNewFile();
+				//lvlFile.createNewFile();
+				defaultLevel.createNewFile();
 			} catch (IOException e) {
-				
+
 				e.printStackTrace();
 			}
-			WriteToFile(lvlFile, idArr, new PathPoint(0,0), new PathPoint(0,0));
+			
+			WriteToFile(defaultLevel, idArr, new PathPoint(0, 0), new PathPoint(0, 0));
 		}
 	}
 
-	//Save to the file
+	// Save to the file
 	public static void WriteToFile(File f, int[] idArr, PathPoint start, PathPoint end) {
 
 		try {
@@ -94,49 +129,49 @@ public class LoadSave {
 			pw.println(start.getYCord());
 			pw.println(end.getXCord());
 			pw.println(end.getYCord());
-			
-			
+
 			pw.close();
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
-	
 
 	private static void WriteToFile(int[] idArr, PathPoint start, PathPoint end) {
-	
+
 		try {
 			PrintWriter pw = new PrintWriter(lvlFile);
-			for(Integer i : idArr)
+			for (Integer i : idArr)
 				pw.println(i);
-		pw.println(start.getXCord());
-		pw.println(start.getYCord());
-		pw.println(end.getXCord());
-		pw.println(end.getYCord());
-		pw.close();
-		}catch(FileNotFoundException e) {
+
+			pw.println(start.getXCord());
+			pw.println(start.getYCord());
+			pw.println(end.getXCord());
+			pw.println(end.getYCord());
+			pw.close();
+
+		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
 	}
 
 	public static void SaveLevel(String name, int[][] idArr, PathPoint start, PathPoint end) {
 
-		if(lvlFile.exists()) {
+		if (lvlFile.exists()) {
 			WriteToFile(Utils.matrixToArray(idArr), start, end);
-		}else {
-			System.out.println("File: "+ lvlFile + " does not exist!");
+		} else {
+			System.out.println("File: " + lvlFile + " does not exist!");
 			return;
 		}
 	}
-	
-	//Load map from the file
+
+	// Load map from the file
 	private static ArrayList<Integer> ReadFromFile(File file) {
 
 		ArrayList<Integer> list = new ArrayList<>();
-		
+
 		try {
-			Scanner sc = new Scanner(lvlFile);
+			Scanner sc = new Scanner(file);
 
 			while (sc.hasNextLine()) {
 				list.add(Integer.parseInt(sc.nextLine()));
@@ -147,54 +182,63 @@ public class LoadSave {
 
 			e.printStackTrace();
 		}
-		
+
 		return list;
 	}
 
-	public static ArrayList<PathPoint> GetLevelPathPoints(){
-		
-		if(lvlFile.exists()) {
-			
-			ArrayList<Integer> list = ReadFromFile(lvlFile);
+	public static ArrayList<PathPoint> GetLevelPathPoints() {
+
+		if(defaultLevel.exists()) {
+			ArrayList<Integer> list = ReadFromFile(defaultLevel);
 			ArrayList<PathPoint> points = new ArrayList<>();
-			
+
 			points.add(new PathPoint(list.get(400), list.get(401)));
 			points.add(new PathPoint(list.get(402), list.get(403)));
-			
+
 			return points;
 		}
-		else {
-			
-			System.out.println("File: "+ lvlFile + " does not exist!");
+		else if (lvlFile.exists()) {
+
+			ArrayList<Integer> list = ReadFromFile(lvlFile);
+			ArrayList<PathPoint> points = new ArrayList<>();
+
+			points.add(new PathPoint(list.get(400), list.get(401)));
+			points.add(new PathPoint(list.get(402), list.get(403)));
+
+			return points;
+		} else {
+
+			System.out.println("File: " + lvlFile + " does not exist!");
 			return null;
-			
+
 		}
-		
+
 	}
-	
-	
+
 	public static int[][] GetLevelData() {
 
-		if(lvlFile.exists()) {
-			ArrayList<Integer> list = ReadFromFile(lvlFile);
+		// Load default level
+		if (defaultLevel.exists() && !newLevelRequested) {
+			
+			ArrayList<Integer> list = ReadFromFile(defaultLevel);
 			return Utils.arrayToMatrix(list, 20, 20);
 		}
-		else {
-			System.out.println("File: "+ lvlFile + " does not exist!");
+		// Load new map if player saved 
+		else if (lvlFile.exists()) {
+			ArrayList<Integer> list = ReadFromFile(lvlFile);
+			return Utils.arrayToMatrix(list, 20, 20);
+		} else {
+			System.out.println("File: " + lvlFile + " does not exist!");
 			return null;
 		}
-		
+
 	}
-	
 
-	
-	//For edit background creation and scenes 
+	// For edit background creation and scenes
 
-
-	
 	public static void CreateLevelE(String name, int[] idArr) {
 		File newLevel = new File("resources/" + name + ".txt");
-		
+
 		if (newLevel.exists()) {
 			System.out.println("File: " + name + " already exists!");
 			return;
@@ -209,7 +253,7 @@ public class LoadSave {
 		}
 
 	}
-	
+
 	private static void WriteToFileE(File f, int[] idArr) {
 		try {
 			PrintWriter pw = new PrintWriter(f);
@@ -222,9 +266,9 @@ public class LoadSave {
 		}
 
 	}
-	
+
 	public static void SaveLevelE(String name, int[][] idArr) {
-		File levelFile = new File("resources/" + name + ".txt");
+		File levelFile = new File("resources" + File.separator + name + ".txt");
 
 		if (levelFile.exists()) {
 			WriteToFileE(levelFile, Utils.matrixToArray(idArr));
@@ -234,7 +278,7 @@ public class LoadSave {
 			return;
 		}
 	}
-	
+
 	private static ArrayList<Integer> ReadFromFileE(File file) {
 		ArrayList<Integer> list = new ArrayList<>();
 
@@ -253,9 +297,10 @@ public class LoadSave {
 
 		return list;
 	}
+
 	public static int[][] GetLevelDataE(String name) {
-		
-		File lvlsFile = new File("resources/" + name + ".txt");
+
+		File lvlsFile = new File("resources" + File.separator + name + ".txt"); // 
 
 		if (lvlsFile.exists()) {
 			ArrayList<Integer> list = ReadFromFileE(lvlsFile);
@@ -263,11 +308,15 @@ public class LoadSave {
 
 		} else {
 			System.out.println("File: " + name + " does not exists! ");
-			return null;
+			
+			ArrayList<Integer> list = new ArrayList<>();
+			for (int i = 0; i < 500; i++) {
+				list.add(i);
+			}
+			
+			return Utils.arrayToMatrix(list, 25, 20);
 		}
 
 	}
-	
-	
-	
+
 }

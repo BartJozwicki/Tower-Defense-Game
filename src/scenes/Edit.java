@@ -1,8 +1,8 @@
 package scenes;
 
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 import Main.Main;
@@ -11,44 +11,50 @@ import objects.PathPoint;
 import objects.Tile;
 import userInterface.ToolBar;
 import static helper.Constants.Tiles.*;
-public class Edit extends GameScene implements SceneMethods{
+
+public class Edit extends GameScene implements SceneMethods {
 
 	private int[][] lvl;
-	private Tile selectedTile;
 	private int mouseX, mouseY;
 	private int lastTileX, lastTileY, lastTileId;
 	private boolean drawSelect;
+	private boolean mapSaved;
+	private Tile selectedTile;
 	private ToolBar toolBar;
 	private PathPoint start, end;
-	
-	
-	
+
+	private int tickerSave, timeSave;
 	private int animationIndex;
 
-	
 	public Edit(Main game) {
 		super(game);
+		mapSaved = false;
 		loadDefaultLevel();
 		toolBar = new ToolBar(0, 640, 640, 160, this);
 	}
-	
 
-	
 	private void loadDefaultLevel() {
-		
-		//lvl = LoadSave.GetLevelDataE("editView");
+
+		// lvl = LoadSave.GetLevelDataE("editView");
 		lvl = LoadSave.GetLevelData();
 		ArrayList<PathPoint> points = LoadSave.GetLevelPathPoints();
-        start = points.get(0);
-        end = points.get(1);
+
+		// Reference point for minions
+		start = points.get(0);
+		end = points.get(1);
+
+		// Timer to display that level has been saved
+		timeSave = 60;
+		tickerSave = 0;
 	}
-	
+
 	public void saveLevel() {
 		LoadSave.SaveLevel("new_level", lvl, start, end);
-		//LoadSave.SaveLevelE("editView", lvl);
+		// LoadSave.SaveLevelE("editView", lvl);
 		game.getPlay().setLevel(lvl);
+		mapSaved = true;
 	}
-	
+
 	public void update() {
 		updateTick();
 	}
@@ -59,21 +65,31 @@ public class Edit extends GameScene implements SceneMethods{
 		toolBar.draw(g);
 		drawSelectedTile(g);
 		drawPathPoints(g);
-		
-	
+
+		if (mapSaved) {
+			drawMapSaved(g);
+		}
 	}
 
+	private void drawMapSaved(Graphics g) {
 
-
-
+		if (tickerSave < timeSave) {
+			g.setFont(new Font("Consolas", Font.BOLD, 40));
+			g.drawString("Map saved", 220, 360);
+			tickerSave++;
+		} else {
+			mapSaved = false;
+			tickerSave = 0;
+		}
+	}
 
 	private void drawPathPoints(Graphics g) {
 
 		if (start != null) {
-          g.drawImage(toolBar.getStartPathImg(), start.getXCord()*32, start.getYCord()*32, null);
+			g.drawImage(toolBar.getStartPathImg(), start.getXCord() * 32, start.getYCord() * 32, null);
 		}
 		if (end != null) {
-		  g.drawImage(toolBar.getEndPathImg(), end.getXCord()*32, end.getYCord()*32, null);
+			g.drawImage(toolBar.getEndPathImg(), end.getXCord() * 32, end.getYCord() * 32, null);
 		}
 
 	}
@@ -92,18 +108,12 @@ public class Edit extends GameScene implements SceneMethods{
 		}
 	}
 
-
-
-
-
-	
-	
 	private void drawSelectedTile(Graphics g) {
 		if (selectedTile != null && drawSelect) {
 			g.drawImage(selectedTile.getSprite(), mouseX, mouseY, 32, 32, null);
 		}
 	}
-	
+
 	public void setSelectedTile(Tile tile) {
 		this.selectedTile = tile;
 		drawSelect = true;
@@ -144,50 +154,42 @@ public class Edit extends GameScene implements SceneMethods{
 
 	}
 
-
-
-
-
 	@Override
 	public void mouseClicked(int x, int y) {
-		if(y >= 640) {
+		if (y >= 640) {
 			toolBar.mouseClicked(x, y);
-		}else {
+		} else {
 			changeTile(mouseX, mouseY);
-		}	
-		
+		}
+
 	}
 
 	@Override
 	public void leftClick() {
 		drawSelect = false;
-		selectedTile = null;	
+		selectedTile = null;
 	}
 
 	@Override
 	public void mouseMoved(int x, int y) {
-		if(y >= 640) {
+		if (y >= 640) {
 			toolBar.mouseMoved(x, y);
 			drawSelect = false;
-		}
-		else
-		{
-			
+		} else {
 			drawSelect = true;
-			//Snap to grid
-			mouseX = (x / 32) *32;
-		    mouseY = (y / 32) * 32;
-		 
+			// Snap to grid
+			mouseX = (x / 32) * 32;
+			mouseY = (y / 32) * 32;
 		}
-		
+
 	}
 
 	@Override
 	public void mousePressed(int x, int y) {
-		if(y >= 640) {
-			toolBar.mousePressed(x, y);			
+		if (y >= 640) {
+			toolBar.mousePressed(x, y);
 		}
-		
+
 	}
 
 	@Override
@@ -206,10 +208,10 @@ public class Edit extends GameScene implements SceneMethods{
 		}
 
 	}
-	
+
 	public void keyPressed(KeyEvent e) {
-		if(e.getKeyCode() == KeyEvent.VK_R)
-		{
+
+		if (e.getKeyCode() == KeyEvent.VK_R && selectedTile != null) {
 			toolBar.rotateSprite();
 		}
 	}

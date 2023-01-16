@@ -3,12 +3,15 @@ package scenes;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 
 import Main.Main;
+import helper.LoadSave;
 import userInterface.Button;
 import static Main.GameStates.*;
 public class GameOver extends GameScene implements SceneMethods{
 
+	private BufferedImage skullImg;
 	private Button bReplay, bMenu;
 	
 	public GameOver(Main game) {
@@ -24,6 +27,8 @@ public class GameOver extends GameScene implements SceneMethods{
 		int y = 150;
 		int yOffset = 100;
 		
+		skullImg = LoadSave.getHeartsAtlas().getSubimage(32 * 8, 32 * 2, 32, 32);
+		
 		bMenu = new Button("Menu", x, y, w, h);
 		bReplay = new Button("Play Again", x, y + yOffset, w, h);
 		
@@ -35,6 +40,7 @@ public class GameOver extends GameScene implements SceneMethods{
 		
      bMenu.draw(g);
      bReplay.draw(g);
+     drawSkulls(g);
  	
      g.setColor(Color.red);
      g.setFont(new Font("Consolas", Font.BOLD, 30));
@@ -42,6 +48,30 @@ public class GameOver extends GameScene implements SceneMethods{
 		
 	}
 
+	private void drawSkulls(Graphics g) {
+		
+		g.drawImage(skullImg, 50, 100, 64, 64, null);
+		g.drawImage(skullImg, 150, 60, 64, 64, null);
+		g.drawImage(skullImg, 500, 100, 64, 64, null);
+		
+		g.drawImage(skullImg, 300, 500, 64, 64, null);
+		g.drawImage(skullImg, 10, 300, 64, 64, null);
+		g.drawImage(skullImg, 550, 300, 64, 64, null);
+		g.drawImage(skullImg, 250, 600, 64, 64, null);
+		g.drawImage(skullImg, 350, 650, 64, 64, null);
+		g.drawImage(skullImg, 70, 600, 64, 64, null);
+		g.drawImage(skullImg, 80, 390, 64, 64, null);
+		
+		g.drawImage(skullImg, 500, 550, 64, 64, null);
+		g.drawImage(skullImg, 450, 450, 64, 64, null);
+		
+		g.drawString("If you find the game too difficult, you can always change the difficulty level in settings" , 200, 350);
+	}
+
+	public void update() {
+		
+	}
+	
 	@Override
 	public void mouseClicked(int x, int y) {
 
@@ -98,5 +128,4 @@ public class GameOver extends GameScene implements SceneMethods{
 		
 		
 	}
-
 }

@@ -23,12 +23,12 @@ public class Tower {
 		this.tier++;
 
 		switch (towerType) {
-		case ARCHER:
+		case AXE_THROWER:
 			dmg += 2;
 			range += 10;
 			cooldown -= 5;
 			break;
-		case WIZARD:
+		case MAGIC:
 			dmg += 2;
 			range += 10;
 			cooldown -= 5;

@@ -7,23 +7,23 @@ import javax.swing.JPanel;
 import inputs.KeyboardListener;
 import inputs.MyMouseListener;
 
-//Contents inside the frame
+/* Class used to define contents of the frame */
+
 @SuppressWarnings("serial")
-public class GamePanel extends JPanel{
+public class GamePanel extends JPanel {
 
+	private MyMouseListener myMouseListener;
+	private KeyboardListener keyListener;
+	private Dimension size;
+	private Main game;
 
-    private MyMouseListener myMouseListener;
-    private KeyboardListener keyListener;
-    private Dimension size;
-    private Main game;
-    
-	GamePanel(Main game){
-		
+	GamePanel(Main game) {
+
 		this.game = game;
 		setPanelSize();
-        
+
 	}
-	
+
 	public void initInputs() {
 
 		myMouseListener = new MyMouseListener(game);
@@ -36,31 +36,21 @@ public class GamePanel extends JPanel{
 		requestFocusInWindow();
 
 	}
-	
+
 	private void setPanelSize() {
-	
+
 		size = new Dimension(640, 800);
-		
-		//setDoubleBuffered(true);
+
 		setMinimumSize(size);
 		setPreferredSize(size);
 		setMaximumSize(size);
 	}
 
-	
-	
-	
 	public void paintComponent(Graphics g) {
-		
+
 		super.paintComponent(g);
 		game.getRender().render(g);
-     	
+
 	}
 
-
-
-
-	
-
-	
 }

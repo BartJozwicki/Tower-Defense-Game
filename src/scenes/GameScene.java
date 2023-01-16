@@ -23,8 +23,8 @@ public class GameScene {
 	}
 	
 	protected void updateTick() {
-		tick++;
 		
+		tick++;
 		
 		if(tick >= WATER_ANIMATION_SPEED) {
 			tick = 0;

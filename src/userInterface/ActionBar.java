@@ -14,31 +14,36 @@ import helper.Constants.Towers;
 import objects.Tower;
 import scenes.Play;
 
+/* Class used to create the action bar during the 'PLAY' scene */
 public class ActionBar extends Bar {
 
 	private Button bMenu, bPause;
 	private Play play;
-
 	private Button[] towerButtons;
-	private Button sellTower, upgradeTower;
-	private Tower selectedTower; // Draw tower
-	private Tower displayTower; // Display tower
-	private BufferedImage[] hearts; //lives left
 
+	// Lives left
+	private BufferedImage[] hearts;
+	// Tower functionality
+	private Button sellTower, upgradeTower;
+	// Draw tower
+	private Tower selectedTower;
+	// Display tower
+	private Tower displayTower;
+	// For accurate time measurement
 	private DecimalFormat formatter;
-	
-	
-    private int lives;
+
+	private int lives;
 	private int gold;
 	private boolean showTowerCost;
 	private boolean needMoreGold;
 	private int towerCostType;
 
 	public ActionBar(int x, int y, int width, int height, Play play) {
+
 		super(x, y, width, height);
 		this.play = play;
 		initButtons();
-		gold = 100;
+		gold = 65;
 		lives = 28;
 		formatter = new DecimalFormat("0.0");
 		hearts = new BufferedImage[30];
@@ -46,9 +51,8 @@ public class ActionBar extends Bar {
 		loadHearts();
 	}
 
-
-
 	private void initButtons() {
+
 		bMenu = new Button("Menu", 2, 642, 100, 30);
 		bPause = new Button("Pause", 2, 682, 100, 30);
 		towerButtons = new Button[3];
@@ -67,20 +71,21 @@ public class ActionBar extends Bar {
 	}
 
 	public void removeOneLife() {
+
 		lives--;
-		if(lives <= 0)
+		if (lives <= 0)
 			SetGameState(GAME_OVER);
 	}
-	
+
 	public void resetEverything() {
-		lives = 25;
+		lives = 28;
 		towerCostType = 0;
 		showTowerCost = false;
-		gold = 100;
+		gold = 65;
 		selectedTower = null;
 		displayTower = null;
-		
 	}
+
 	public void draw(Graphics g) {
 
 		g.setColor(new Color(0, 123, 15));
@@ -93,30 +98,39 @@ public class ActionBar extends Bar {
 		drawGoldAmount(g);
 
 		if (showTowerCost) {
-			drawTowerCost(g);
+			drawTowerInformation(g);
 		}
 		// DisplayedTower
 		drawDisplayedTower(g);
-		
-		if(play.isGamePaused()) {
+
+		if (play.isGamePaused()) {
 			g.setColor(Color.black);
-			g.setFont(new Font("Consolas", Font.BOLD, 20));
-			g.drawString("Game paused", 110, 790);
+			g.setFont(new Font("Consolas", Font.BOLD, 40));
+			g.drawString("Game paused", 180, 560);
 		}
-		
+
 		drawLivesLeft(g);
-		
-		
+
+		drawTips(g);
 	}
 
+	private void drawTips(Graphics g) {
+		if (!play.getWaveManager().isInitDelayOver()) {
 
+			g.setColor(Color.LIGHT_GRAY);
+			g.fillRect(28, 330, 590, 20);
+			g.setFont(new Font("Consolas", Font.BOLD, 17));
+			g.setColor(Color.black);
+			g.drawString("Quickly, select one of the towers and place it close to the road!", 30, 345);
 
-
+		}
+	}
 
 	private void drawButtons(Graphics g) {
 
 		bMenu.draw(g);
 		bPause.draw(g);
+		
 		for (Button b : towerButtons) {
 			g.setColor(Color.LIGHT_GRAY);
 			g.fillRect(b.x, b.y, b.width, b.height);
@@ -127,22 +141,33 @@ public class ActionBar extends Bar {
 
 	}
 
-	private void drawTowerCost(Graphics g) {
+	private void drawTowerInformation(Graphics g) {
 
 		g.setColor(Color.LIGHT_GRAY);
-		g.fillRect(280, 650, 120, 50);
+		if (towerCostType == 0)
+			g.fillRect(100, 615, 355, 20);
+		if (towerCostType == 1)
+			g.fillRect(100, 615, 180, 20);
+		if (towerCostType == 2)
+			g.fillRect(100, 615, 300, 20);
 
 		g.setColor(Color.black);
-		g.drawRect(280, 650, 120, 50);
+		g.setFont(new Font("Consolas", Font.BOLD, 14));
+		g.drawString("" + getTowerInfo(), 100, 630);
 
-		g.drawString("" + getTowerCostName(), 285, 670);
-		g.drawString("Cost: " + getTowerCostCost() + "g", 285, 695);
+		g.setColor(Color.LIGHT_GRAY);
+		g.fillRect(268, 650, 130, 50);
+
+		g.setColor(Color.black);
+		g.drawRect(268, 650, 130, 50);
+		g.setFont(new Font("Consolas", Font.BOLD, 20));
+		g.drawString("" + getTowerCostName(), 273, 670);
+		g.drawString("Cost: " + getTowerCostCost() + "g", 273, 695);
 
 		// if not enough money
 		if (isCurrentCostMoreThanCurrentGold() || needMoreGold) {
 			g.setColor(Color.red);
 			g.drawString("Need more gold!", 245, 725);
-			
 		}
 
 	}
@@ -162,7 +187,7 @@ public class ActionBar extends Bar {
 			g.setFont(new Font("Consolas", Font.BOLD, 15));
 			g.drawString("" + Towers.GetName(displayTower.getTowerType()), 490, 660);
 			g.drawString("ID: " + displayTower.getId(), 490, 680);
-			g.drawString("Tier: " + displayTower.getTier(), 560, 660);
+			g.drawString("Tier: " + displayTower.getTier(), 560, 680);
 
 			drawSelectedTowerRange(g);
 			drawSelectedTowerBorder(g);
@@ -187,20 +212,20 @@ public class ActionBar extends Bar {
 		}
 
 	}
-	
+
 	private void drawLivesLeft(Graphics g) {
 		g.setFont(new Font("Consolas", Font.BOLD, 20));
 		g.setColor(Color.black);
-		g.drawImage(hearts[28-lives], 179, 725, 38, 38, null);
+		g.drawImage(hearts[28 - lives], 65, 725, 38, 38, null);
 		g.drawString("Lives: " + lives, 110, 750);
-		
+
 	}
 
 	private int getSellAmount(Tower selectedTower) {
 
 		int upgradeCost = (selectedTower.getTier() - 1) * getUpgradeCost(selectedTower);
 		upgradeCost /= 2;
-		
+
 		return helper.Constants.Towers.GetTowerCost(selectedTower.getTowerType()) / 2 + upgradeCost;
 	}
 
@@ -215,32 +240,30 @@ public class ActionBar extends Bar {
 
 	private void upgradeTowerClicked() {
 
-	
-		if(getUpgradeCost(displayTower) <= gold) {
-		   gold -= getUpgradeCost(displayTower);
-		   play.upgradeTower(displayTower);
-		}else {
+		if (getUpgradeCost(displayTower) <= gold) {
+			gold -= getUpgradeCost(displayTower);
+			play.upgradeTower(displayTower);
+		} else {
 			needMoreGold = true;
 		}
-			
 
 	}
 
 	private int getUpgradeCost(Tower displayedTower) {
-		return (int) (helper.Constants.Towers.GetTowerCost(displayedTower.getTowerType()) * 0.3f);
+		return (int) (helper.Constants.Towers.GetTowerCost(displayedTower.getTowerType()));
 	}
 
 	private boolean isCurrentCostMoreThanCurrentGold() {
 
 		return gold < getTowerCostCost();
 	}
-	
+
 	private void loadHearts() {
 		int imgCnt = 0;
-		for(int i = 0; i < 3; i++)
-			for(int j = 0; j < 10; j++) {
-			hearts[imgCnt] = LoadSave.getHeartsAtlas().getSubimage(j*32, i*32, 32, 32);
-			imgCnt++;
+		for (int i = 0; i < 3; i++)
+			for (int j = 0; j < 10; j++) {
+				hearts[imgCnt] = LoadSave.getHeartsAtlas().getSubimage(j * 32, i * 32, 32, 32);
+				imgCnt++;
 			}
 	}
 
@@ -250,8 +273,11 @@ public class ActionBar extends Bar {
 	}
 
 	private String getTowerCostName() {
-
 		return helper.Constants.Towers.GetName(towerCostType);
+	}
+
+	private String getTowerInfo() {
+		return helper.Constants.Towers.GetInfo(towerCostType);
 	}
 
 	private void drawGoldAmount(Graphics g) {
@@ -262,6 +288,7 @@ public class ActionBar extends Bar {
 
 	private void drawEnemiesLeftInfo(Graphics g) {
 		int remaining = play.getEnemyManager().numberOfEnemiesAlive();
+		g.setColor(Color.black);
 		g.drawString("Enemies Left: " + remaining, 425, 770);
 
 	}
@@ -275,7 +302,7 @@ public class ActionBar extends Bar {
 	}
 
 	private void drawWaveTimerInfo(Graphics g) {
-		if (play.getWaveManager().isWaveTimerStarted()) {
+		if (play.getWaveManager().isWaveTimerStarted() || !play.getWaveManager().isInitDelayOver()) {
 
 			float timeLeft = play.getWaveManager().getTimeLeft();
 			String formatedText = formatter.format(timeLeft);
@@ -319,13 +346,13 @@ public class ActionBar extends Bar {
 	private void setGameState() {
 
 		play.setGamePaused(!play.isGamePaused());
-		if(play.isGamePaused())
+		if (play.isGamePaused())
 			bPause.setText("Start");
 		else
 			bPause.setText("Pause");
-		
+
 	}
-	
+
 	private boolean isGoldEnoughtForTower(int towerType) {
 
 		return gold >= helper.Constants.Towers.GetTowerCost(towerType);
@@ -363,8 +390,6 @@ public class ActionBar extends Bar {
 			}
 		}
 	}
-
-
 
 	public void mouseMoved(int x, int y) {
 
@@ -463,6 +488,7 @@ public class ActionBar extends Bar {
 		this.gold += getReward;
 
 	}
+
 	public int getLives() {
 		return lives;
 	}

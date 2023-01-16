@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import static helper.Constants.Enemies.*;
 
 public class Button {
 
@@ -11,6 +12,7 @@ public class Button {
 	private String text;
 	private Rectangle bounds; // to check if mouse is within bounds
 	private boolean mouseOver, mousePressed;
+	private int lockColor;
 	
 	//reg Buttons
 	public Button(String text, int x, int y, int width, int height) {
@@ -21,6 +23,7 @@ public class Button {
 		this.width = width;
 		this.height = height;
         this.id = -1;
+        lockColor = 1;
         
 		initBounds();
 	}
@@ -71,9 +74,7 @@ public class Button {
 		}
 	}
 	
-	public void setMousePressed(boolean mouseClicked) {
-		this.mousePressed = mouseClicked;
-	}
+	
 
 	private void drawBody(Graphics g) {
         
@@ -87,11 +88,34 @@ public class Button {
 
 	}
 	
-	public void setMouseOver(boolean mouseOver)
-	{
-			this.mouseOver = mouseOver;
 	
+    public void drawSettingsB(Graphics g ,int i) {
+        
+		if((mouseOver && i == EASY) || (i == EASY && lockColor == EASY)) {
+			g.setColor(Color.green);
+		}else if((mouseOver && i == NORMAL) || (i == NORMAL && lockColor == NORMAL)) {
+			g.setColor(Color.yellow);
+		}else if((mouseOver && i == HARD) || (i == HARD && lockColor == HARD)){
+			g.setColor(Color.red);
+		}
+		else {
+		g.setColor(Color.WHITE);
+		}
+		
+		g.fillRect(x, y, width, height);
+		//Border
+	    drawBorder(g);
+				
+				
+		//Text
+	    drawText(g);
+
 	}
+	
+	
+
+	
+	
 
 	private void drawText(Graphics g) {
 		
@@ -124,5 +148,16 @@ public class Button {
 	{
 		return this.id;
 	}
+	public void setLockColor(int lck) {
+		this.lockColor = lck;
+	}
+	
+	public void setMouseOver(boolean mouseOver){
+	    this.mouseOver = mouseOver;
+	}
+	public void setMousePressed(boolean mouseClicked) {
+		this.mousePressed = mouseClicked;
+	}
+	
 	
 }

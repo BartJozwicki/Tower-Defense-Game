@@ -14,15 +14,17 @@ import static Main.GameStates.*;
 public class Menu extends GameScene implements SceneMethods {
 
 	private BufferedImage[] charactersImgs;
-	private Button bPlay, bEdit, bSettings, bQuit;
+	private Button bPlay, bTutorial, bEdit, bSettings, bQuit;
 	private int[][] lvl;
 
 	public Menu(Main game) {
+
 		super(game);
 		initButton();
 
 		lvl = LoadSave.GetLevelDataE("editView");
 		charactersImgs = new BufferedImage[5];
+
 		loadCharactersImgs();
 
 	}
@@ -36,9 +38,10 @@ public class Menu extends GameScene implements SceneMethods {
 		int yOffset = 100;
 
 		bPlay = new Button("Play", x, y, w, h);
-		bEdit = new Button("Edit", x, y + yOffset, w, h);
-		bSettings = new Button("Settings", x, y + yOffset * 2, w, h);
-		bQuit = new Button("Quit", x, y + yOffset * 3, w, h);
+		bTutorial = new Button("Tutorial", x, y + yOffset, w, h);
+		bEdit = new Button("Edit Map", x, y + yOffset * 2, w, h);
+		bSettings = new Button("Settings", x, y + yOffset * 3, w, h);
+		bQuit = new Button("Quit", x, y + yOffset * 4, w, h);
 
 	}
 
@@ -49,6 +52,10 @@ public class Menu extends GameScene implements SceneMethods {
 			charactersImgs[i] = atlas.getSubimage(32 * i, 32, 32, 32);
 		}
 		charactersImgs[4] = atlas.getSubimage(32 * 3, 3 * 32, 32, 32);
+	}
+
+	public void update() {
+
 	}
 
 	@Override
@@ -71,17 +78,23 @@ public class Menu extends GameScene implements SceneMethods {
 
 	private void drawCharacters(Graphics g) {
 
+		// Orcs in the menu
+
 		g.drawImage(charactersImgs[0], 100, 640, 64, 64, null);
 		g.drawImage(charactersImgs[0], 50, 50, 64, 64, null);
 		g.drawImage(charactersImgs[0], 70, 450, 64, 64, null);
 		g.drawImage(charactersImgs[0], 580, 540, 64, 64, null);
-		g.drawImage(charactersImgs[0], 90, 300, 64, 64, null);
+		g.drawImage(charactersImgs[0], 90, 260, 64, 64, null);
+		g.drawImage(charactersImgs[0], 250, 40, 64, 64, null);
 		g.drawImage(charactersImgs[0], 450, 30, 64, 64, null);
 
-		g.drawImage(charactersImgs[1], 180, 150, 64, 64, null);
-		g.drawImage(charactersImgs[2], 300, 500, 64, 64, null);
-		g.drawImage(charactersImgs[3], 400, 300, 64, 64, null);
-		// g.drawImage(charactersImgs[4], 500, 640, 64, 64, null);
+		g.drawImage(charactersImgs[1], 480, 150, 64, 64, null);
+		g.drawImage(charactersImgs[1], 480, 380, 64, 64, null);
+
+		g.drawImage(charactersImgs[2], 440, 600, 64, 64, null);
+
+		g.drawImage(charactersImgs[3], 415, 285, 64, 64, null);
+
 	}
 
 	private void drawLevel(Graphics g) {
@@ -95,10 +108,8 @@ public class Menu extends GameScene implements SceneMethods {
 				} else {
 					g.drawImage(getSprite(id), x * 32, y * 32, null);
 				}
-
 			}
 		}
-
 	}
 
 	private void drawButtons(Graphics g) {
@@ -107,6 +118,7 @@ public class Menu extends GameScene implements SceneMethods {
 		bEdit.draw(g);
 		bSettings.draw(g);
 		bQuit.draw(g);
+		bTutorial.draw(g);
 
 	}
 
@@ -115,6 +127,11 @@ public class Menu extends GameScene implements SceneMethods {
 
 		if (bPlay.getBounds().contains(x, y)) {
 			SetGameState(PLAYING);
+		}
+
+		if (bTutorial.getBounds().contains(x, y)) {
+			SetGameState(TUTORIAL);
+
 		}
 
 		if (bSettings.getBounds().contains(x, y)) {
@@ -138,9 +155,14 @@ public class Menu extends GameScene implements SceneMethods {
 		bSettings.setMouseOver(false);
 		bEdit.setMouseOver(false);
 		bQuit.setMouseOver(false);
+		bTutorial.setMouseOver(false);
 
 		if (bPlay.getBounds().contains(x, y)) {
 			bPlay.setMouseOver(true);
+		}
+
+		if (bTutorial.getBounds().contains(x, y)) {
+			bTutorial.setMouseOver(true);
 		}
 
 		if (bEdit.getBounds().contains(x, y)) {
@@ -161,6 +183,10 @@ public class Menu extends GameScene implements SceneMethods {
 
 		if (bPlay.getBounds().contains(x, y)) {
 			bPlay.setMousePressed(true);
+		}
+
+		if (bTutorial.getBounds().contains(x, y)) {
+			bTutorial.setMousePressed(true);
 		}
 		if (bSettings.getBounds().contains(x, y)) {
 			bSettings.setMousePressed(true);
@@ -186,7 +212,7 @@ public class Menu extends GameScene implements SceneMethods {
 		bSettings.resetBooleans();
 		bQuit.resetBooleans();
 		bEdit.resetBooleans();
-
+		bTutorial.resetBooleans();
 	}
 
 	@Override

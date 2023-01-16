@@ -5,93 +5,127 @@ import managers.EnemyManager;
 
 import static helper.Constants.Direction.*;
 
-//All minions are derived from this class 
+/* All minions are derived from this class */
 public abstract class Enemy {
 
 	protected EnemyManager enemyManager;
-	protected float x, y;
 	protected Rectangle bounds;
-	protected int health;
-	protected int maxHealth;
-	protected int id;
-	protected int enemyType;
-	protected int lastDir;
+	protected float x, y;
 	protected boolean alive;
-	protected int slowTick;
-	protected int slowTime;
-	
-	
-	public Enemy(float x, float y, int id, int enemyType, EnemyManager enemyManager) {
-		
+	protected int health, maxHealth, id, enemyType;
+	protected int lastDir;	
+	protected int slowTick, slowTime;
+	protected int deadTimer, deadTick;
+	protected int caracassType;
+
+	public Enemy(float x, float y, int id, int enemyType, int caracassType, EnemyManager enemyManager) {
+
 		this.x = x;
 		this.y = y;
 		this.id = id;
 		this.enemyType = enemyType;
-		
-		
-		//body of the minion
-		bounds = new Rectangle((int) x, (int) y, 22, 22); 
+		this.enemyManager = enemyManager;
+		this.caracassType = caracassType;
+
+		// Body of the minion
+		bounds = new Rectangle((int) x, (int) y, 22, 22);
 		lastDir = -1;
-		setStartHealth();
+
+		//Special effect "slow" duration
 		slowTick = 121;
 		slowTime = 120;
+		
+		//Carcass timer 
+		deadTimer = 360; // = 3sec
+		deadTick = 1;	
+		
+		//Set health of the minion
+		setStartHealth();
+		
+		//Let it live!
 		alive = true;
-		this.enemyManager = enemyManager;
 	}
-	
+
 	private void setStartHealth() {
-		health = helper.Constants.Enemies.GetStartHealth(enemyType);
+		health = helper.Constants.Enemies.GetStartHealth(enemyType, enemyManager.getDifficultyLevel());
 		maxHealth = health;
 	}
+	
+	public boolean displayBody(){
+		
+		if(deadTick < deadTimer) {
+			deadTick++;
+			return true;
+		}
+		return false;	
+	}
+
 	public void move(float speed, int dir) {
-		
+
 		lastDir = dir;
-		
-		if(slowTick < slowTime) {
+
+		if (slowTick < slowTime) {
 			slowTick++;
 			speed *= 0.5f;
 		}
-		
-		switch(dir) {
-		
-		case LEFT -> this.x -= speed;	
+
+		switch (dir) {
+
+		case LEFT -> this.x -= speed;
 		case UP -> this.y -= speed;
-		case RIGHT -> this.x += speed;	
+		case RIGHT -> this.x += speed;
 		case DOWN -> this.y += speed;
-				
+
 		}
 		updateHitbox();
 	}
-	
+
 	private void updateHitbox() {
-	  bounds.x = (int) x;
-	  bounds.y = (int) y;
-		
+		bounds.x = (int) x;
+		bounds.y = (int) y;
+
 	}
 
-	//Initial position of the 
+	public void takeDmg(int dmg) {
+
+		this.health -= dmg;
+
+		if (health <= 0) {
+			alive = false;
+			enemyManager.rewardPlayer(enemyType);
+		}
+	}
+
+	public boolean isAlive() {
+		return alive;
+	}
+
+	public boolean isSlowed() {
+		return slowTick < slowTime;
+	}
+
+	// Initial position of the minion
 	public void setPos(int x, int y) {
 		this.x = x;
 		this.y = y;
 	}
-	
-	//Getters and Setter
-	
+
+	// Getters and Setters
 	public float getHealthBarFloat() {
-		return health / (float)maxHealth;
+		return health / (float) maxHealth;
 	}
-	
+
 	public void killEnemy() {
-		
+
 		alive = false;
 		health = 0;
-		
+
 	}
-	
+
 	public void slow() {
 		slowTick = 0;
 	}
-	
+
 	public float getX() {
 		return x;
 	}
@@ -139,28 +173,17 @@ public abstract class Enemy {
 	public void setEnemyType(int enemyType) {
 		this.enemyType = enemyType;
 	}
-	
+
 	public int getLastDir() {
 		return lastDir;
 	}
-
-	public void takeDmg(int dmg) {
-		
-		this.health -= dmg;
-		
-		if(health <= 0) {
-			alive = false;
-			enemyManager.rewardPlayer(enemyType);
-		}
+	
+	public int getCaracassType() {
+		return caracassType;
 	}
 	
-	
-	public boolean isAlive() {
-		return alive;
+	public void doNotDisplayCarcass() {
+		deadTick = 361;
 	}
-	public boolean isSlowed() {
-		return slowTick < slowTime;
-	}
-
 
 }
