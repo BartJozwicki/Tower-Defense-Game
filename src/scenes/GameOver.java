@@ -65,7 +65,10 @@ public class GameOver extends GameScene implements SceneMethods{
 		g.drawImage(skullImg, 500, 550, 64, 64, null);
 		g.drawImage(skullImg, 450, 450, 64, 64, null);
 		
-		g.drawString("If you find the game too difficult, you can always change the difficulty level in settings" , 200, 350);
+		g.setFont(new Font("Consolas", Font.BOLD, 20));
+		g.drawString("If you find the game too difficult," , 100, 330);
+		g.drawString("you can always change" , 100, 350);
+		g.drawString("the difficulty level in settings" , 100, 370);
 	}
 
 	public void update() {
