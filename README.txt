@@ -1,6 +1,6 @@
 Tower Defense Game
 
-The project was created in eclipse using core Java 18. The concept of the game is derived from the well-known concept of a 'Tower Defense game' which is to defend a player's territories 
+The project was created in eclipse using core Java. The concept of the game is derived from the well-known 'Tower Defense game' which is to defend a player's territories 
 or possessions by obstructing the enemy attackers or by stopping enemies from reaching the exits.
 
 The project is a multi-level game with a variety of opponents and towers with special effects.
